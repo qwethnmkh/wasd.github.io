@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Write Note</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      padding: 10px;
+      background-color: #f1f1f1;
+    }
+    .note-container {
+      padding: 20px;
+    }
+    .button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+    #noteHeader {
+      font-size: 24px;
+      padding: 5px;
+      border: none;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    #noteContent {
+      font-size: 18px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+      width: 100%;
+      resize: vertical;
+      height: 100%;
+      background: #ffbe95;
+      cursor: text; /* Set cursor style to text initially */
+    }
+    .note-toolbar {
+      margin-bottom: 10px;
+    }
+    .note-content {
+      min-height: 200px;
+      border: 1px solid #ddd;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Create a Note</h1>
+  </div>
+
+  <div class="note-container">
+    <div class="header">
+      <input type="text" id="noteHeader" placeholder="Enter header">
+    </div>
+    <div class="note-toolbar">
+      <button class="button" onclick="toggleBold()"><b>B</b></button>
+      <button class="button" onclick="toggleItalic()"><i>I</i></button>
+      <button class="button" onclick="toggleUnderline()"><u>U</u></button>
+      <input type="number" class="button" onchange="changeFontSize(event)" min="1" max="100" placeholder="Font Size">
+      <input type="color" class="button" onchange="changeFontColor(event)" title="Font Color">
+      <input type="color" class="button" onchange="changePageBackground(event)" title="Page Background">
+      <select class="button" onchange="changeTextAlignment(event)">
+        <option value="">Text Alignment</option>
+        <option value="left">Left</option>
+        <option value="center">Center</option>
+        <option value="right">Right</option>
+        <option value="justify">Justify</option>
+      </select>
+    </div>
+    <div class="note-content" contenteditable="true" id="noteContent" placeholder="Enter your note"></div>
+    <button class="button" onclick="saveNote()">Save</button>
+    <a href="note.html" target="_blank">
+      <button class="button">View saved notes</button>
+    </a>
+    
+    
+    <a href="index.html" target="_blank">
+        <button class="button">Go Back ↪</button>
+    </a>
+  </div>
+
+  <script>
+    var typingArea = document.getElementById('noteContent');
+
+    typingArea.addEventListener('focus', function() {
+      // Enable cursor movement when typing area is focused
+      typingArea.style.cursor = 'text';
+    });
+
+    typingArea.addEventListener('blur', function() {
+      // Disable cursor movement when typing area loses focus
+      typingArea.style.cursor = 'default';
+    });
+
+    function saveNote() {
+      var header = document.getElementById('noteHeader').value;
+      var content = document.getElementById('noteContent').innerHTML;
+      var fontSize = document.getElementById('noteContent').style.fontSize;
+
+      if (header.trim() !== '' && content.trim() !== '') {
+        var note = { header: header, content: content, fontSize: fontSize };
+        var notes = getSavedNotes();
+        notes.push(note);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        clearNotePage();
+      }
+    }
+
+    function clearNotePage() {
+      document.getElementById('noteHeader').value = '';
+      document.getElementById('noteContent').innerHTML = '';
+      alert('Note saved successfully!');
+    }
+
+    function getSavedNotes() {
+      var savedNotes = localStorage.getItem('notes');
+      return savedNotes ? JSON.parse(savedNotes) : [];
+    }
+
+    function toggleBold() {
+      document.execCommand('bold', false, null);
+    }
+
+    function toggleItalic() {
+      document.execCommand('italic', false, null);
+    }
+
+    function toggleUnderline() {
+      document.execCommand('underline', false, null);
+    }
+
+    function changeFontSize(event) {
+      var fontSize = event.target.value;
+      document.execCommand('fontSize', false, '1');
+      var noteContent = document.getElementById('noteContent');
+      noteContent.style.fontSize = fontSize + 'px';
+    }
+
+    function changeFontColor(event) {
+      var fontColor = event.target.value;
+      document.execCommand('foreColor', false, fontColor);
+    }
+
+    function changePageBackground(event) {
+      var pageBackground = event.target.value;
+      document.body.style.backgroundColor = pageBackground;
+    }
+
+    function changeTextAlignment(event) {
+      var alignment = event.target.value;
+      var command;
+
+      switch (alignment) {
+        case 'left':
+          command = 'justifyLeft';
+          break;
+        case 'center':
+          command = 'justifyCenter';
+          break;
+        case 'right':
+          command = 'justifyRight';
+          break;
+        case 'justify':
+          command = 'justifyFull';
+          break;
+        default:
+          command = '';
+          break;
+      }
+
+      document.execCommand(command, false, null);
+    }
+  </script>
+</body>
+</html>
